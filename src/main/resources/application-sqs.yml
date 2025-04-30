@@ -1,0 +1,32 @@
+spring:
+  main:
+    web-application-type: none # Não é uma aplicação web
+
+  autoconfigure:
+    exclude:
+      # Exclui auto-configurações Web
+      - org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration
+      - org.springframework.boot.autoconfigure.web.servlet.ServletWebServerFactoryAutoConfiguration
+      - org.springframework.boot.autoconfigure.web.embedded.EmbeddedWebServerFactoryCustomizerAutoConfiguration
+      # Exclui auto-configuração de segurança web (SecurityConfig está em @Profile("http"))
+      - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+      - org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
+      - org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration
+      - org.springframework.boot.autoconfigure.security.oauth2.resource.servlet.OAuth2ResourceServerAutoConfiguration
+      # Exclui Springdoc/Swagger
+      - org.springdoc.core.configuration.SpringDocConfiguration
+      - org.springdoc.core.configuration.SpringDocWebMvcConfiguration
+      - org.springdoc.webmvc.ui.SwaggerConfig
+      - org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
+
+  # Configuração Spring Cloud Function para SQS
+  cloud:
+    function:
+      # Mapeia para o bean Consumer<SQSEvent> definido na classe principal
+      definition: saleCreatedConsumer
+    aws:
+      # Garante que SQS e SNS estejam habilitados (padrão é true, mas explícito)
+      sqs:
+        enabled: true
+      sns:
+        enabled: true
