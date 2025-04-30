@@ -112,17 +112,19 @@ jobs:
       - name: Update HTTP Lambda Function Code
         run: |
           aws lambda update-function-code \
-            --function-name ${{ secrets.LAMBDA_FUNCTION_NAME_SALES_HTTP }} \ 
+            --function-name ${{ secrets.LAMBDA_FUNCTION_NAME_SALES_HTTP }} \
             --s3-bucket ${{ secrets.S3_DEPLOY_BUCKET }} \
-            --s3-key ${{ steps.find_jar.outputs.jar_filename }} \ 
+            --s3-key ${{ steps.find_jar.outputs.jar_filename }} \
             --publish
+
+
         env:
           AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
 
       - name: Update SQS Lambda Function Code
         run: |
           aws lambda update-function-code \
-            --function-name ${{ secrets.LAMBDA_FUNCTION_NAME_SALES_SQS }} \ 
+            --function-name ${{ secrets.LAMBDA_FUNCTION_NAME_SALES_SQS }} \
             --s3-bucket ${{ secrets.S3_DEPLOY_BUCKET }} \
             --s3-key ${{ steps.find_jar.outputs.jar_filename }} \
             --publish
