@@ -1,0 +1,56 @@
+# src/main/resources/application-local.yml
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/autohub_sales_dev
+    username: salesuser
+    password: salespassword
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+
+  flyway:
+    enabled: false
+
+  # Configuração para apontar clientes AWS para o LocalStack
+  cloud:
+    aws:
+      credentials:
+        access-key: test
+        secret-key: test
+      region:
+        static: us-east-1
+      endpoint: http://localhost:4566
+
+# Definição dos nomes/ARNs dos recursos NO LOCALSTACK
+# Use nomes simples para facilitar
+sqs:
+  queue:
+    # Nome da fila SQS que o listener da Sales API vai procurar no LocalStack
+    sales-events: SalesApi_Events_Queue-local
+
+sns:
+  topic:
+    # ARN do tópico SNS no LocalStack (formato padrão do LocalStack)
+    main-event-bus-arn: arn:aws:sns:us-east-1:000000000000:AutoHubBusinessEventsTopic-local
+
+aws:
+  region: us-east-1
+  localstack:
+    endpoint: http://localhost:4566 # Endpoint padrão do LocalStack
+  credentials:
+    accessKey: test
+    secretKey: test
+
+logging:
+  level:
+    com.fiap.autohub: DEBUG
+    org.springframework: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE
+    io.awspring.cloud: DEBUG

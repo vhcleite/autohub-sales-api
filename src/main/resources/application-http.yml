@@ -1,0 +1,17 @@
+spring:
+  # Configurações específicas para HTTP
+  cloud:
+    aws:
+      # Desabilita explicitamente SQS/SNS se não forem usados pelos endpoints HTTP
+      sqs:
+        enabled: false
+      sns:
+        enabled: false
+  autoconfigure:
+    exclude:
+      # Exclui auto-configurações de SQS/SNS/Function
+      - io.awspring.cloud.autoconfigure.sqs.SqsAutoConfiguration
+      - io.awspring.cloud.autoconfigure.sqs.SqsListenerAutoConfiguration
+      - io.awspring.cloud.autoconfigure.sns.SnsAutoConfiguration
+      - org.springframework.cloud.function.serverless.web.ServerlessAutoConfiguration # Exclui config web serverless conflitante
+      - org.springframework.cloud.function.context.config.ContextFunctionCatalogAutoConfiguration # Exclui config do catálogo de funções

@@ -1,0 +1,44 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  # Banco de dados PostgreSQL para a Sales API
+  postgres-sales:
+    image: postgres:15-alpine
+    container_name: postgres-sales-local
+    environment:
+      POSTGRES_DB: autohub_sales_dev
+      POSTGRES_USER: salesuser
+      POSTGRES_PASSWORD: salespassword
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_sales_data:/var/lib/postgresql/data
+    networks:
+      - autohub-local-net
+
+  # LocalStack para simular serviços AWS (SNS, SQS)
+  localstack:
+    image: localstack/localstack:3.6.0
+    container_name: localstack-autohub
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=sns,sqs
+      - DEBUG=0
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - DEFAULT_REGION=us-east-1
+    volumes:
+      - localstack_data:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./localstack-init/init-aws.sh:/etc/localstack/init/ready.d/init-aws.sh
+    networks:
+      - autohub-local-net
+
+volumes:
+  postgres_sales_data:
+  localstack_data:
+
+networks:
+  autohub-local-net:
+    driver: bridge
