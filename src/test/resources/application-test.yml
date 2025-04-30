@@ -1,0 +1,17 @@
+spring:
+  autoconfigure:
+    exclude: io.awspring.cloud.autoconfigure.config.secretsmanager.SecretsManagerAutoConfiguration
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false # Mantenha false ou mude para true para debug
+
+  flyway:
+    enabled: false
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://test.issuer # Dummy para testes

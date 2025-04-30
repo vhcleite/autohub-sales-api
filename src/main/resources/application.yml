@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: autohub-sales-api
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+    default-property-inclusion: non_null
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://cognito-idp.us-east-1.amazonaws.com/us-east-1_8UvCaSvhB
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+
+# Configuração Springdoc comum
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+  default-property-naming-strategy: snake_case
+
+sqs:
+  queue:
+    sales-events: ${SQS_QUEUE_SALES_EVENTS_NAME:SalesApi_Events_Queue-local}
+
+sns:
+  topic:
+    main-event-bus-arn: ${SNS_TOPIC_MAIN_EVENT_BUS_ARN:arn:aws:sns:us-east-1:000000000000:AutoHubBusinessEventsTopic-local}
+
+# Propriedades AWS comuns ou defaults (podem ser sobrescritas por perfis/env vars)
+aws:
+  region: ${AWS_REGION:us-east-1}
+  localstack:
+    endpoint: ${AWS_LOCALSTACK_ENDPOINT:http://localhost:4566}
+  credentials:
+    accessKey: ${AWS_LOCAL_ACCESS_KEY:test}
+    secretKey: ${AWS_LOCAL_SECRET_KEY:test}
+  secretsmanager:
+    db-password-secret-arn: ${DB_PASSWORD_SECRET_ARN:dummy-secret-arn}
