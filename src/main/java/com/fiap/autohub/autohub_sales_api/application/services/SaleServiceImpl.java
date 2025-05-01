@@ -67,7 +67,7 @@ public class SaleServiceImpl implements SaleServicePort {
     public void handleVehicleReservationFailure(VehicleReservationFailedEvent event) {
         log.warn("Handling VehicleReservationFailedEvent for sale ID: {}. Reason: {}", event.saleId(), event.reason());
         Sale sale = findSaleByIdOrThrow(event.saleId());
-        if (sale.getStatus() == SaleStatus.PENDING_RESERVATION) {
+        if (sale.getStatus() == SaleStatus.PROCESSING) {
             sale.setStatus(SaleStatus.RESERVATION_FAILED);
             sale.setFailureReason(event.reason());
             saleRepository.save(sale);
@@ -82,9 +82,8 @@ public class SaleServiceImpl implements SaleServicePort {
     public void handleChargeCreationFailure(ChargeCreationFailedEvent event) {
         log.warn("Handling ChargeCreationFailedEvent for sale ID: {}. Reason: {}", event.saleId(), event.reason());
         Sale sale = findSaleByIdOrThrow(event.saleId());
-        // Assume que o status esperado antes seria PENDING_PAYMENT
-        if (sale.getStatus() == SaleStatus.PENDING_PAYMENT) {
-            sale.setFailureReason("Charge creation failed: " + event.reason()); // Define a razão e atualiza status/timestamp
+        if (sale.getStatus() == SaleStatus.PROCESSING) {
+            sale.setFailureReason("Charge creation failed: " + event.reason());
             saleRepository.save(sale);
             log.info("Sale {} status updated to FAILED due to charge creation failure", event.saleId());
         } else {
@@ -97,25 +96,22 @@ public class SaleServiceImpl implements SaleServicePort {
     public void handlePaymentCompletion(PaymentCompletedEvent event) {
         log.info("Handling PaymentCompletedEvent for sale ID: {}", event.saleId());
         Sale sale = findSaleByIdOrThrow(event.saleId());
-        // Assume que o status esperado é PENDING_PAYMENT
-        if (sale.getStatus() == SaleStatus.PENDING_PAYMENT) {
+        if (sale.getStatus() == SaleStatus.PROCESSING) {
             log.info("Payment completed for sale {}. Proceeding to documentation phase.", sale.getId());
-            // Atualiza status e chargeId
             sale.setStatus(SaleStatus.PROCESSING_DOCUMENTATION);
-            sale.setChargeId(event.chargeId()); // Atualiza updatedAt
-            saleRepository.save(sale); // Salva estado intermediário
+            sale.setChargeId(event.chargeId());
+            saleRepository.save(sale);
 
             // Simula chamada DETRAN
-            boolean detranSuccess = true; // Simulação
+            boolean detranSuccess = true;
 
             if (detranSuccess) {
                 sale.setStatus(SaleStatus.COMPLETED);
-                // sale.setDetranProcessId("DETRAN-123"); // Se houver ID
-                saleRepository.save(sale); // Salva estado final
+                saleRepository.save(sale);
                 log.info("Sale {} status updated to COMPLETED", sale.getId());
             } else {
-                sale.setFailureReason("DETRAN processing failed."); // Define a razão e atualiza status/timestamp para FAILED
-                saleRepository.save(sale); // Salva estado final de falha
+                sale.setFailureReason("DETRAN processing failed.");
+                saleRepository.save(sale);
                 log.error("Sale {} status updated to DOCUMENTATION_FAILED", sale.getId());
             }
         } else {
@@ -128,9 +124,9 @@ public class SaleServiceImpl implements SaleServicePort {
     public void handlePaymentFailure(PaymentFailedEvent event) {
         log.warn("Handling PaymentFailedEvent for sale ID: {}. Reason: {}", event.saleId(), event.reason());
         Sale sale = findSaleByIdOrThrow(event.saleId());
-        if (sale.getStatus() == SaleStatus.PENDING_PAYMENT) {
-            sale.setStatus(SaleStatus.PAYMENT_FAILED); // Atualiza status e updatedAt
-            sale.setFailureReason("Payment failed: " + event.reason()); // Define a razão (não muda mais status)
+        if (sale.getStatus() == SaleStatus.PROCESSING) {
+            sale.setStatus(SaleStatus.PAYMENT_FAILED);
+            sale.setFailureReason("Payment failed: " + event.reason());
             saleRepository.save(sale);
             log.info("Sale {} status updated to PAYMENT_FAILED", event.saleId());
         } else {
@@ -143,9 +139,9 @@ public class SaleServiceImpl implements SaleServicePort {
     public void handleChargeExpiration(ChargeExpiredEvent event) {
         log.warn("Handling ChargeExpiredEvent for sale ID: {}", event.saleId());
         Sale sale = findSaleByIdOrThrow(event.saleId());
-        if (sale.getStatus() == SaleStatus.PENDING_PAYMENT) {
-            sale.setStatus(SaleStatus.PAYMENT_EXPIRED); // Atualiza status e updatedAt
-            sale.setFailureReason("Payment charge expired."); // Define a razão
+        if (sale.getStatus() == SaleStatus.PROCESSING) {
+            sale.setStatus(SaleStatus.PAYMENT_EXPIRED);
+            sale.setFailureReason("Payment charge expired.");
             saleRepository.save(sale);
             log.info("Sale {} status updated to PAYMENT_EXPIRED", event.saleId());
         } else {

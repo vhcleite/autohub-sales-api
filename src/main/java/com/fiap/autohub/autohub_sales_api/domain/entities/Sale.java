@@ -25,21 +25,20 @@ public class Sale {
     private OffsetDateTime updatedAt;
     private Long version;
 
-    // Construtor padrão (necessário para JPA/MapStruct)
     public Sale() {
-        this.createdAt = OffsetDateTime.now(ZoneOffset.UTC); // Pode inicializar aqui
+        this.createdAt = OffsetDateTime.now(ZoneOffset.UTC);
         this.updatedAt = this.createdAt;
         this.version = 0L;
     }
 
     public Sale(UUID vehicleId, String buyerUserId, String sellerUserId, BigDecimal price) {
-        this(); // Chama o construtor padrão para inicializar timestamps/version
+        this();
         this.id = null;
         this.vehicleId = vehicleId;
         this.buyerUserId = buyerUserId;
         this.sellerUserId = sellerUserId;
         this.price = price;
-        this.status = SaleStatus.PENDING_RESERVATION;
+        this.status = SaleStatus.PROCESSING;
     }
 
     public Sale(UUID id, UUID vehicleId, String buyerUserId, String sellerUserId, BigDecimal price,
