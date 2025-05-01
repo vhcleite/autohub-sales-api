@@ -10,7 +10,7 @@ public class PingController {
 
     private static final Logger logger = LoggerFactory.getLogger(PingController.class);
 
-    @GetMapping("/ping")
+    @GetMapping("/sales/ping")
     public String ping() {
         logger.info("Ping endpoint invoked!");
         return "pong-3";
